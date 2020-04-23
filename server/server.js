@@ -1,40 +1,29 @@
 const express = require('express');
 const http = require('http');
 const socket = require('socket.io');
-// const redis = require('socket.io-redis');
-// const cluster = require('cluster');
-// var numCPUs = require('os').cpus().length;
 const bodyParser = require('body-parser');
-const fs = require('fs');
 const cors = require('cors');
-
 const app = express();
 const server = http.createServer(app);
 const io = socket(server);
+const mysql = require('mysql');
+const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: '1111',
+    port: '3306',
+    database: 'aiow'
+})
+
 app.use(bodyParser.json())
 app.use('/css', express.static('./static/css'));
 app.use('/js', express.static('./static/js'));
 app.use(cors());
+app.set('view engine', 'ejs');
+app.use(express.static(__dirname + '/static'));
 
-app.get('/', (req, res) => {
-    fs.readFile('./static/index.html', (err, data) => {
-        if(err){
-            res.send('error');
-        }else{
-            res.writeHead(200, {'Content-Type':'text/html'});
-            res.write(data);
-            res.end()
-        }
-    })
-})
-
-app.get('/api', (req, res) => {
-    res.json(
-        {
-            username: "Kim"
-        }
-    );
-})
+const userRouter = require('./router/user');
+app.use('/api', userRouter);
 
 io.sockets.on('connect', (socket) => {
 
@@ -44,7 +33,6 @@ io.sockets.on('connect', (socket) => {
         data.name = socket.name;
         console.log(data);
         io.sockets.in(roomName).emit('update', data);
-        // socket.broadcast.emit('update', data);
     })
 
     socket.on('joinRoom', (num, name) => {

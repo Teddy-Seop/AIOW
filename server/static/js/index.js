@@ -10,11 +10,10 @@ socket.on('connect', () => {
 })
 
 socket.on('update', (data) => {
-    var str = `${data}<br>`;
+    var str = `${data}\n`;
     // 객체 추가
     console.log(str);
     document.querySelector('#content').value += str;
-    // document.querySelector('#content').listview('refresh');
 })
 
 
@@ -27,8 +26,6 @@ const send = () => {
 
 //room 선택 함수
 const ns = (num) => {
+    document.querySelector('#content').value = '';
     socket.emit('joinRoom', num, name);
-    // num++;
-    // num %= 2;
-    // socket.emit('leaveRoom', num, name);
 }

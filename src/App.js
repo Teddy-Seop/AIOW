@@ -1,4 +1,6 @@
 import React from 'react';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { Login, Test } from './component';
 import './App.css';
 
 class App extends React.Component {
@@ -10,17 +12,22 @@ class App extends React.Component {
     }
   }
 
-  componentDidMount(){
-    fetch('http://localhost:3001/api')
-      .then(res => res.json())
-      .then(data => this.setState({username: data.username}))
-  }
+  // componentDidMount(){
+  //   fetch('http://localhost:3001/api')
+  //     .then(res => res.json())
+  //     .then(data => this.setState({username: data.username}))
+  // }
 
   render(){
     return (
       <div className="App">
         <header className="App-header">
-          {this.state.username ? `Hello ${this.state.username}` : 'Hello World'}
+          <BrowserRouter>
+            <Switch>
+              <Route exact path="/" component={Login} />
+              <Route path="/test" component={Test} />
+            </Switch>
+          </BrowserRouter>
         </header>
       </div>
     );
