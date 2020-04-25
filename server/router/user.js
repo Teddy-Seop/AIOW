@@ -17,18 +17,20 @@ router.post('/login', (req, res) => {
   connection.query(`SELECT * FROM user WHERE id="${id}"`, (err, rows) => {
     if(err) throw err;
 
-    if(rows[0].id == id && rows[0].pw == pw){
-      res.json(
-        {
-          login: "success"
-        }
-      );
+    if(rows[0] != null){
+      if(rows[0].id == id && rows[0].pw == pw){
+        res.json(
+          {
+            login: "success"
+          }
+        )
+      }else{
+        res.json({login: "fail"})        
+      }
+    }else{
+      res.json({login: "fail"})        
     }
   })
-});
-
-router.get('/chat', (req, res) => {
-  res.render('../static/index', { title: 'Express' });
 });
  
 module.exports = router;

@@ -27,7 +27,12 @@ class Login extends React.Component{
         })
         .then((res) => {
             console.log(res.data);
-            this.props.history.push("/test");
+            if(res.data.login != 'fail'){
+                this.props.history.push("/workspace");
+            }else{
+                alert('Login Fail');
+            }
+            
         })
     }
 

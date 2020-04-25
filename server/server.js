@@ -23,7 +23,9 @@ app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/static'));
 
 const userRouter = require('./router/user');
+const workspaceRouter = require('./router/workspace');
 app.use('/api', userRouter);
+app.use('/api/workspace', workspaceRouter);
 
 io.sockets.on('connect', (socket) => {
 
