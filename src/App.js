@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { Login, Entrance, Workspace } from './component';
-import './App.css';
+import './css/app.css'
 
 class App extends React.Component {
 
@@ -15,7 +15,6 @@ class App extends React.Component {
   render(){
     return (
       <div className="App">
-        <header className="App-header">
           <BrowserRouter>
             <Switch>
               <Route exact path="/" component={Login} />
@@ -26,7 +25,6 @@ class App extends React.Component {
               />
             </Switch>
           </BrowserRouter>
-        </header>
       </div>
     );
   }

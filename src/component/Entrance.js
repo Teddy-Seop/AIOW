@@ -1,4 +1,6 @@
 import React from 'react';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
 
 class Entrance extends React.Component{
 
@@ -20,9 +22,18 @@ class Entrance extends React.Component{
 
     render(){
         return (
-            <div>
-                Workspace <input type="text" id="workspace" onChange={this.handleWorkspace} /><br/>
-                <button type="button" onClick={this.workspace}>Enter</button>
+            <div id="center">
+                Workspace 
+                <TextField
+                    id="standard-basic"
+                    onChange={this.handleWorkspace}
+                /><br></br>
+                <Button 
+                    variant="contained"
+                    onClick={this.workspace}
+                >
+                    Enter
+                </Button>
             </div>
         )
     }

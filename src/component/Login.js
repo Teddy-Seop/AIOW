@@ -1,5 +1,10 @@
 import React from 'react';
 import axios from 'axios';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Link from '@material-ui/core/Link';
+import Grid from '@material-ui/core/Grid';
+import Container from '@material-ui/core/Container';
 
 class Login extends React.Component{
 
@@ -38,12 +43,41 @@ class Login extends React.Component{
 
     render(){
         return (
-            <div>
-                <form >
-                    ID <input type="text" id="id" onChange={this.handleId} /><br/>
-                    PW <input type="password" id="pw" onChange={this.handlePw} /><br/>
-                    <button type="button" onClick={this.login}>LOGIN</button>
-                </form>
+            <div id="center">
+            <Container component="main" maxWidth="xs">
+                <div>
+                <TextField
+                    variant="standard"
+                    margin="normal"
+                    fullWidth
+                    label="ID"
+                    autoFocus
+                    onChange={this.handleId}
+                />
+                <TextField
+                    variant="standard"
+                    margin="normal"
+                    fullWidth
+                    label="PW"
+                    onChange={this.handlePw}
+                />
+                <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    color="default"
+                    onClick={this.login}
+                >Sign In
+                </Button>
+                <Grid container>
+                    <Grid item>
+                        <Link href="#" variant="body2">
+                            {"Sign Up"}
+                            </Link>
+                            </Grid>
+                    </Grid>
+                </div>
+                </Container>
             </div>
         )
     }
