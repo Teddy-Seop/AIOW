@@ -27,6 +27,11 @@ const workspaceRouter = require('./router/workspace');
 app.use('/api', userRouter);
 app.use('/api/workspace', workspaceRouter);
 
+app.get('/', (req, res) => {
+
+    res.render('./static/index');
+})
+
 io.sockets.on('connect', (socket) => {
 
     var roomName = 1;
@@ -44,9 +49,9 @@ io.sockets.on('connect', (socket) => {
     });
 
     socket.on('leaveRoom', (num, name) => {
-        socket.leave(room[num], () => {
-          console.log(name + ' leave a ' + room[num]);
-          io.to(room[num]).emit('leaveRoom', num, name);
+        socket.leave(num, () => {
+          console.log(name + ' leave a ' + num);
+          io.to(num).emit('leaveRoom', num, name);
         });
     });
 

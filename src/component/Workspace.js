@@ -3,7 +3,7 @@ import Axios from 'axios';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Chat from './Chat';
-import '../css/workspace.css';
+import '../static/css/workspace.css';
 
 class Workspace extends React.Component{
 
@@ -16,7 +16,6 @@ class Workspace extends React.Component{
     }
 
     path = this.props.match.params.workspace;
-
     side = async () => {
         await Axios.get(`http://localhost:3001/api/workspace/${this.path}`)
         .then((res) => {
@@ -33,10 +32,11 @@ class Workspace extends React.Component{
             }
         }
     )}
-
+    
     channel = (no) => {
-        console.log(no);
-        this.setState({channel: no});
+        this.setState(() => {
+            return {channel: no}
+        });
     }
 
     componentDidMount(){
@@ -74,6 +74,7 @@ class Workspace extends React.Component{
                         this.state.channel != 0 ? (
                             <div>
                                 <Chat
+                                    key={this.state.channel}
                                     workspace={this.path}
                                     channel={this.state.channel}
                                 />   

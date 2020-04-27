@@ -1,12 +1,13 @@
-const socket = io()
+import io from 'socket.io-client';
+const socket = io('http://localhost:3001')
 var name = 'anonymous';
 var room = null;
 
 // Connect 이벤트
 socket.on('connect', () => {
     name = prompt("What's your name?");
-    let room = ['room1', 'room2'];
-    let num = 0;
+    console.log(2)
+    let num = 1;
     
     socket.emit('joinRoom', num, name);
 })

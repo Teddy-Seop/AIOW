@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { Login, Entrance, Workspace } from './component';
-import './css/app.css'
+import './static/css/app.css'
 
 class App extends React.Component {
 
