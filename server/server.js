@@ -33,17 +33,17 @@ app.get('/', (req, res) => {
 })
 
 io.sockets.on('connect', (socket) => {
-
-    var roomName = 1;
+    //console.log(`user : ${socket.client.id}`);
+    var room = 1;
 
     socket.on('message', (data) => {
-        data.name = socket.name;
         console.log(data);
-        io.sockets.in(roomName).emit('update', data);
+        console.log(room);
+        io.sockets.in(room).emit('update', data);
     })
 
     socket.on('joinRoom', (num, name) => {
-        roomName = num;
+        room = num;
         console.log(`${name} is join ${num}`);
         socket.join(num);
     });

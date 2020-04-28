@@ -1,16 +1,16 @@
 import React, {useEffect} from 'react';
 import Axios from 'axios';
 import io from 'socket.io-client';
-// import '../static/js/socket.js';
+var socket = io.connect('http://localhost:3001/');
 
 class Chat extends React.Component{
 
     constructor(props){
         super(props);
+        this.send = this.send.bind(this);
         this.state = {
           info: [],
-          name: 'anonymous',
-          room: 1
+          name: 'anonymous'
         }
     }
 
@@ -26,89 +26,63 @@ class Chat extends React.Component{
                     info: this.state.info.concat(item)
                 })
             }
-            const socket = io.connect('http://localhost:3001');
+
+            socket = io.connect('http://localhost:3001/');
+            this.setState({
+                socket: socket,
+                channel: this.channel
+            });
+            
             // Connect 이벤트
             socket.on('connect', () => {
-                this.state.name = prompt("What's your name?");
-                console.log(1)
-                let num = 1;
                 
                 var content = document.querySelector('#content');
                 this.state.info.map((item) => {
                     content.value += `${item.message}\n`;
                 })
-                socket.emit('joinRoom', this.state.room, this.state.name);
-            })
-            this.setState({
-                socket: socket,
-                room: this.channel
-            });
-            socket.on('update', (data) => {
-                var str = `${data}\n`;
-                // 객체 추가
-                console.log(str);
-                document.querySelector('#content').value += str;
+                socket.emit('joinRoom', this.state.channel, this.state.name);
             })
         })
     }
 
     componentDidMount(){
         this.load();
+        socket.on('update', (data) => {
+            console.log('update');
+            var str = `${data}\n`;
+            // 객체 추가
+            console.log(str);
+            document.querySelector('#content').value += str;
+        })
+    }            
+    
+    send(){
+        var message = document.querySelector('#message');
+        var name = this.state.name
+        socket.emit('message', {
+            message: message.value,
+            name: name
+        });
+        message.value = '';
+        // socket.emit('update', ({
+        //     message: message
+        // }))
     }
 
-    // initSocket = () => {
-    //     const socket = io.connect('http://localhost:3001');
-    //     // Connect 이벤트
-    //     socket.on('connect', () => {
-    //         this.state.name = prompt("What's your name?");
-    //         console.log(1)
-    //         let num = 1;
-            
-    //         var content = document.querySelector('#content');
-    //         this.state.info.map((item) => {
-    //             content.value += `${item.message}\n`;
-    //         })
-    //         socket.emit('joinRoom', this.state.room, this.state.name);
-    //     })
-    //     this.setState({
-    //         socket: socket,
-    //         room: this.channel
-    //     });
-    //     socket.on('update', (data) => {
-    //         var str = `${data}\n`;
-    //         // 객체 추가
-    //         console.log(str);
-    //         document.querySelector('#content').value += str;
-    //     })
+    // //room 선택 함수
+    // ns = (num) => {
+    //     document.querySelector('#content').value = '';
+    //     this.state.socket.emit('leaveRoom', this.state.room, this.state.name);
+    //     this.state.socket.emit('joinRoom', num, this.state.name);
+    //     this.state.room = num;
     // }
-    
-    // send 함수
-    send = () => {
-        var message = document.querySelector('#message');
-        document.querySelector('#message').value = '';
-        this.state.socket.emit('message', {message: message}) //전송
-    }
-    
-    //room 선택 함수
-    ns = (num) => {
-        document.querySelector('#content').value = '';
-        this.state.socket.emit('leaveRoom', this.state.room, this.state.name);
-        this.state.socket.emit('joinRoom', num, this.state.name);
-        this.state.room = num;
-    }
 
     render(){
         return (
             <div>
                 <div id="main">
                     <input type="text" id="message" />
-                    <button type="button" onClick={
-                        () => {
-                            var message = document.querySelector('#message');
-                            document.querySelector('#message').value = '';
-                            this.state.socket.emit('message', {message: message}) //전송
-                        }
-                    }>SEND</button>
+                    <button type="button" onClick={this.send}>SEND</button>
                     <textarea id="content" cols="30" rows="10" readOnly></textarea>
                 </div>
             </div>

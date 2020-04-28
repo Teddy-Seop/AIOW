@@ -37,40 +37,40 @@ router.get("/:workspace/:channel", (req, res) => {
   connection.query(sql, (err, rows) => {
     if(err) throw err;
 
-    io.sockets.on('connect', (socket) => {
-      console.log("join")
-      var roomName = 1;
-  
-      socket.on('message', (data) => {
-          data.name = socket.name;
-          console.log(data);
-          io.sockets.in(roomName).emit('update', data);
-      })
-  
-      socket.on('joinRoom', (num, name) => {
-          roomName = num;
-          console.log(`${name} is join ${num}`);
-          socket.join(num);
-      });
-  
-      socket.on('leaveRoom', (num, name) => {
-          socket.leave(num, () => {
-            console.log(name + ' leave a ' + num);
-            io.to(num).emit('leaveRoom', num, name);
-          });
-      });
-  
-      socket.on('disconnect', () => {
-          console.log(`${socket.name} is disconnected`);
-          socket.broadcast.emit('update', {
-              type: 'disconnect',
-              name: 'SERVER',
-              message: `${socket.name} is disconnected`
-          });
-      })
+    res.json(rows);
+  })
+})
+
+io.sockets.on('connect', (socket) => {
+  console.log(`user : ${socket.client.id}`);
+  var room = 1;
+
+  socket.on('message', (data) => {
+      console.log(data);
+      console.log(room);
+      io.sockets.in(room).emit('update', data);
   })
 
-    res.json(rows);
+  socket.on('joinRoom', (num, name) => {
+      roomName = num;
+      console.log(`${name} is join ${num}`);
+      socket.join(num);
+  });
+
+  socket.on('leaveRoom', (num, name) => {
+      socket.leave(num, () => {
+        console.log(name + ' leave a ' + num);
+        io.to(num).emit('leaveRoom', num, name);
+      });
+  });
+
+  socket.on('disconnect', () => {
+      console.log(`${socket.name} is disconnected`);
+      socket.broadcast.emit('update', {
+          type: 'disconnect',
+          name: 'SERVER',
+          message: `${socket.name} is disconnected`
+      });
   })
 })
 
