@@ -11,7 +11,8 @@ class Workspace extends React.Component{
         super(props);
         this.state = {
           info: [],
-          channel: 0
+          channel: 0,
+          name: Math.random() * 100
         }
     }
 
@@ -77,6 +78,7 @@ class Workspace extends React.Component{
                                     key={this.state.channel}
                                     workspace={this.path}
                                     channel={this.state.channel}
+                                    name={this.state.name}
                                 />   
                             </div>  
                         ):(

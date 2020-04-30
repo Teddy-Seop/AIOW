@@ -33,25 +33,24 @@ app.get('/', (req, res) => {
 })
 
 io.sockets.on('connect', (socket) => {
-    //console.log(`user : ${socket.client.id}`);
     var room = 1;
 
     socket.on('message', (data) => {
         console.log(data);
-        console.log(room);
+        console.log(socket.rooms);
+        //socket.broadcast.emit('update', data);
         io.sockets.in(room).emit('update', data);
     })
 
     socket.on('joinRoom', (num, name) => {
         room = num;
-        console.log(`${name} is join ${num}`);
-        socket.join(num);
+        console.log(`${name} is join ${room}`);
+        socket.join(room);
     });
 
     socket.on('leaveRoom', (num, name) => {
         socket.leave(num, () => {
           console.log(name + ' leave a ' + num);
-          io.to(num).emit('leaveRoom', num, name);
         });
     });
 

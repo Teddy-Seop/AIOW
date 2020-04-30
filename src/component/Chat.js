@@ -1,8 +1,7 @@
 import React, {useEffect} from 'react';
 import Axios from 'axios';
 import io from 'socket.io-client';
-var socket = io.connect('http://localhost:3001/');
-
+var socket = null;
 class Chat extends React.Component{
 
     constructor(props){
@@ -10,51 +9,49 @@ class Chat extends React.Component{
         this.send = this.send.bind(this);
         this.state = {
           info: [],
-          name: 'anonymous'
+          name: this.props.name,
+          channel: this.props.channel
         }
     }
 
     path = this.props.workspace;
     channel = this.props.channel;
 
-    load = async () => {
-        await Axios.get(`http://localhost:3001/api/workspace/${this.path}/${this.channel}`)
+    // componentWillMount(){
+    //     socket = io.connect('http://localhost:3001/');
+    // }
+
+    componentDidMount(){
+        socket = io.connect('http://localhost:3001/');
+        Axios.get(`http://localhost:3001/api/workspace/${this.path}/${this.channel}`)
         .then((res) => {
+            console.log(`load`);
             console.log(res.data)
             for(let item of res.data){
                 this.setState({
                     info: this.state.info.concat(item)
                 })
             }
-
-            socket = io.connect('http://localhost:3001/');
-            this.setState({
-                socket: socket,
-                channel: this.channel
-            });
-            
-            // Connect 이벤트
-            socket.on('connect', () => {
-                
-                var content = document.querySelector('#content');
-                this.state.info.map((item) => {
-                    content.value += `${item.message}\n`;
-                })
-                socket.emit('joinRoom', this.state.channel, this.state.name);
+        })
+        // Connect 이벤트
+        socket.on('connect', () => {          
+            console.log(`connect`);
+            var content = document.querySelector('#content');
+            this.state.info.map((item) => {
+                content.value += `${item.message}\n`;
             })
+            socket.emit('joinRoom', this.state.channel, this.state.name);
+        })
+        socket.on('update', (data) => {
+            console.log('update');
+            var str = `${data.message}\n`;
+            document.querySelector('#content').value += str;
         })
     }
 
-    componentDidMount(){
-        this.load();
-        socket.on('update', (data) => {
-            console.log('update');
-            var str = `${data}\n`;
-            // 객체 추가
-            console.log(str);
-            document.querySelector('#content').value += str;
-        })
-    }            
+    componentWillUnmount(){
+        socket.emit('leaveRoom', this.state.channel, this.state.name);
+    }
     
     send(){
         var message = document.querySelector('#message');
@@ -64,18 +61,7 @@ class Chat extends React.Component{
             name: name
         });
         message.value = '';
-        // socket.emit('update', ({
-        //     message: message
-        // }))
     }
-
-    // //room 선택 함수
-    // ns = (num) => {
-    //     document.querySelector('#content').value = '';
-    //     this.state.socket.emit('leaveRoom', this.state.room, this.state.name);
-    //     this.state.socket.emit('joinRoom', num, this.state.name);
-    //     this.state.room = num;
-    // }
 
     render(){
         return (
@@ -89,5 +75,4 @@ class Chat extends React.Component{
         )
     }
 }
-
 export default Chat;
