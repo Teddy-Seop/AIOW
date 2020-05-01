@@ -9,7 +9,7 @@ class Chat extends React.Component{
         this.send = this.send.bind(this);
         this.state = {
           info: [],
-          name: this.props.name,
+          uno: window.sessionStorage.getItem('uno'),
           channel: this.props.channel
         }
     }
@@ -17,26 +17,23 @@ class Chat extends React.Component{
     path = this.props.workspace;
     channel = this.props.channel;
 
-    // componentWillMount(){
-    //     socket = io.connect('http://localhost:3001/');
-    // }
-
     componentDidMount(){
         socket = io.connect('http://localhost:3001/');
         Axios.get(`http://localhost:3001/api/workspace/${this.path}/${this.channel}`)
         .then((res) => {
-            console.log(`load`);
             console.log(res.data)
-            for(let item of res.data){
-                this.setState({
-                    info: this.state.info.concat(item)
-                })
-            }
+            this.setState({
+                info: res.data
+            })
+            var content = document.querySelector('#content');
+            this.state.info.map((item) => {
+                content.value += `${item.message}\n`;
+            })
         })
         // Connect 이벤트
-        socket.on('connect', () => {          
-            console.log(`connect`);
+        socket.on('connect', () => {
             var content = document.querySelector('#content');
+            console.log(this.state.info);
             this.state.info.map((item) => {
                 content.value += `${item.message}\n`;
             })
@@ -55,10 +52,10 @@ class Chat extends React.Component{
     
     send(){
         var message = document.querySelector('#message');
-        var name = this.state.name
         socket.emit('message', {
             message: message.value,
-            name: name
+            uno: this.state.uno,
+            channel: this.state.channel
         });
         message.value = '';
     }

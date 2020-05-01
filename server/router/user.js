@@ -21,7 +21,9 @@ router.post('/login', (req, res) => {
       if(rows[0].id == id && rows[0].pw == pw){
         res.json(
           {
-            login: "success"
+            login: "success",
+            uno: rows[0].no,
+            name: rows[0].name
           }
         )
       }else{

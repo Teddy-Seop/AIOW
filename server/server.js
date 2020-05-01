@@ -37,8 +37,12 @@ io.sockets.on('connect', (socket) => {
 
     socket.on('message', (data) => {
         console.log(data);
-        console.log(socket.rooms);
-        //socket.broadcast.emit('update', data);
+        var sql = `INSERT INTO message (message, user_no, channel_no)
+                    VALUES ("${data.message}", ${data.uno}, ${data.channel});`;
+        connection.query(sql, (err, rows) => {
+          if(err) throw err;
+          console.log(rows);
+        })
         io.sockets.in(room).emit('update', data);
     })
 

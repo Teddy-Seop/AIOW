@@ -33,6 +33,8 @@ class Login extends React.Component{
         .then((res) => {
             console.log(res.data);
             if(res.data.login != 'fail'){
+                window.sessionStorage.setItem('uno', res.data.uno);
+                window.sessionStorage.setItem('name', res.data.name);
                 this.props.history.push("/workspace");
             }else{
                 alert('Login Fail');
