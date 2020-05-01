@@ -18,9 +18,14 @@ class Workspace extends React.Component{
 
     path = this.props.match.params.workspace;
     side = async () => {
-        await Axios.get(`http://localhost:3001/api/workspace/${this.path}`)
+        await Axios.get(`http://localhost:3001/api/workspace/${this.path}`, {
+            params: {
+                uno: window.sessionStorage.uno
+            }
+        })
         .then((res) => {
-            if(res.data.validate != 'fail'){
+            console.log(res);
+            if(res.data[0][0].validate == 'success'){
                 document.querySelector('#name').innerHTML = res.data[0][0].name;
                 for(let item of res.data[1]){
                     this.setState({
@@ -28,7 +33,7 @@ class Workspace extends React.Component{
                     })
                 }
             }else{
-                alert('Workspace does not exist');
+                alert(`${res.data[0][0].validate}`);
                 this.props.history.push(`/workspace`);
             }
         }

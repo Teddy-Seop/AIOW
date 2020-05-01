@@ -1,9 +1,7 @@
-var express = require('express');
-var router = express.Router();
-const http = require('http');
-const socket = require('socket.io');
-const server = http.createServer(express);
-const io = socket(server);
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+const router = express.Router();
 const mysql = require('mysql');
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -14,18 +12,35 @@ const connection = mysql.createConnection({
   multipleStatements: true
 })
 
+app.use(bodyParser.json());
+
 router.get("/:workspace", (req, res) => {
   
-  var sql1 = `SELECT * FROM workspace WHERE name="${req.params.workspace}";`;
-  var sql2 = `SELECT * FROM channel WHERE workspace_no = (SELECT no FROM workspace WHERE name="${req.params.workspace}");`
-  connection.query(sql1 + sql2, (err, rows) => {
+  var sql1 = `SELECT * FROM workspace 
+              WHERE name="${req.params.workspace}";`;
+  var sql2 = `SELECT * FROM channel 
+              WHERE workspace_no = (
+                SELECT no FROM workspace 
+                WHERE name="${req.params.workspace}"
+              );`;
+  var sql3 = `SELECT * FROM workspace_user
+              WHERE user_no = (
+                SELECT no FROM user 
+                WHERE no="${req.query.uno}"
+              )`;
+  connection.query(sql1 + sql2 + sql3, (err, rows) => {
     if(err) throw err;
     console.log(rows);
-    if(rows[0] != null){
-      rows[0].validate = 'success';
+    if(rows[0][0] != null && rows[2][0] != null){
+      rows[0][0].validate = 'success';
+      console.log(rows)
+      res.json(rows);
+    }else if(rows[2][0] == null) {
+      rows[0][0].validate = '접근 권한이 없습니다.';
       res.json(rows);
     }else{
-      res.json({validate: 'fail'});
+      rows[0][0].validate = 'Workspace does not exist';
+      res.json(rows);
     }
   })
 })
@@ -38,39 +53,6 @@ router.get("/:workspace/:channel", (req, res) => {
     if(err) throw err;
 
     res.json(rows);
-  })
-})
-
-io.sockets.on('connect', (socket) => {
-  console.log(`user : ${socket.client.id}`);
-  var room = 1;
-
-  socket.on('message', (data) => {
-      console.log(data);
-      console.log(room);
-      io.sockets.in(room).emit('update', data);
-  })
-
-  socket.on('joinRoom', (num, name) => {
-      roomName = num;
-      console.log(`${name} is join ${num}`);
-      socket.join(num);
-  });
-
-  socket.on('leaveRoom', (num, name) => {
-      socket.leave(num, () => {
-        console.log(name + ' leave a ' + num);
-        io.to(num).emit('leaveRoom', num, name);
-      });
-  });
-
-  socket.on('disconnect', () => {
-      console.log(`${socket.name} is disconnected`);
-      socket.broadcast.emit('update', {
-          type: 'disconnect',
-          name: 'SERVER',
-          message: `${socket.name} is disconnected`
-      });
   })
 })
 
