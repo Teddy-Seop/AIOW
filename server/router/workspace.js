@@ -14,6 +14,20 @@ const connection = mysql.createConnection({
 
 app.use(bodyParser.json());
 
+// workspace 생성
+router.post(`/`, (req, res) => {
+  console.log(req.body);
+  var sql = `INSERT INTO workspace (name, owner_no)
+              VALUES ("${req.body.workspace}", ${req.body.uno})`;
+  connection.query(sql, (err, rows) => {
+    if(err) throw err;
+
+    console.log('Success');
+  })
+  
+})
+
+// workspace 조회
 router.get("/:workspace", (req, res) => {
   
   var sql1 = `SELECT * FROM workspace 
@@ -30,21 +44,28 @@ router.get("/:workspace", (req, res) => {
               )`;
   connection.query(sql1 + sql2 + sql3, (err, rows) => {
     if(err) throw err;
-    console.log(rows);
     if(rows[0][0] != null && rows[2][0] != null){
       rows[0][0].validate = 'success';
       console.log(rows)
       res.json(rows);
     }else if(rows[2][0] == null) {
-      rows[0][0].validate = '접근 권한이 없습니다.';
+      rows[0][0].validate = 'authority'
+      rows[0][0].message = '접근 권한이 없습니다.';
+      console.log(rows);
       res.json(rows);
     }else{
-      rows[0][0].validate = 'Workspace does not exist';
+      rows[0].push({
+        validate : 'fail',
+        workspace: req.params.workspace,
+        message : 'Workspace가 존재하지 않습니다.\n새 Workspace를 생성하시겠습니까?'
+      })
+      console.log(rows);
       res.json(rows);
     }
   })
 })
 
+// channel 조회
 router.get("/:workspace/:channel", (req, res) => {
   var channel = req.params.channel;
   console.log(`channel : ${channel}`);

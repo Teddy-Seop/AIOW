@@ -1,5 +1,7 @@
 import React from 'react';
 import Axios from 'axios';
+import {confirmAlert} from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Chat from './Chat';
@@ -32,9 +34,36 @@ class Workspace extends React.Component{
                         info: this.state.info.concat(item)
                     })
                 }
-            }else{
-                alert(`${res.data[0][0].validate}`);
+            }else if(res.data[0][0].validate == 'authority'){
+                alert(`${res.data[0][0].message}`);
                 this.props.history.push(`/workspace`);
+            }else{
+                confirmAlert({
+                    title: 'test',
+                    message: `${res.data[0][0].message}`,
+                    buttons: [
+                        {
+                            label: 'Yes',
+                            onClick: () => {
+                                Axios.post(`http://localhost:3001/api/workspace`, {
+                                    //{
+                                        workspace: res.data[0][0].workspace,
+                                        uno: window.sessionStorage.uno
+                                    //}
+                                })
+                                .then(() => {
+                                    console.log('create');
+                                })
+                            }
+                        },
+                        {
+                            label: 'No',
+                            onClick: () => {
+                                this.props.history.push(`/workspace`);
+                            }
+                        }
+                    ]
+                });
             }
         }
     )}
