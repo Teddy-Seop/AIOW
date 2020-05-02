@@ -46,10 +46,8 @@ class Workspace extends React.Component{
                             label: 'Yes',
                             onClick: () => {
                                 Axios.post(`http://localhost:3001/api/workspace`, {
-                                    //{
-                                        workspace: res.data[0][0].workspace,
-                                        uno: window.sessionStorage.uno
-                                    //}
+                                    workspace: res.data[0][0].workspace,
+                                    uno: window.sessionStorage.uno
                                 })
                                 .then(() => {
                                     console.log('create');
