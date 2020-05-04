@@ -24,7 +24,7 @@ class Entrance extends React.Component{
                 left                  : '50%',
                 right                 : 'auto',
                 bottom                : 'auto',
-                //marginRight           : '-50%',
+                marginRight           : '-50%',
                 transform             : 'translate(-50%, -50%)'
               }
           }
@@ -57,7 +57,7 @@ class Entrance extends React.Component{
             uno: window.sessionStorage.uno
         })
         .then(()=> {
-            console.log('test');
+            console.log('Create Workspace');
         })
     }
 

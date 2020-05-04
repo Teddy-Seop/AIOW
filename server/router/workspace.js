@@ -77,4 +77,21 @@ router.get("/:workspace/:channel", (req, res) => {
   })
 })
 
+// channel 생성
+router.post("/channel", (req, res) => {
+  console.log(req.body);
+  var sql1 = `SELECT no FROM workspace
+              WHERE name="${req.body.wname}"`;
+  var sql2 = `INSERT INTO channel (name, workspace_no)
+            VALUES ("${req.body.channel}", (${sql1}))`;
+  connection.query(sql2, (err, rows) => {
+    if(err) throw err;
+
+    console.log(rows.insertId);
+    res.json({
+      no: rows.insertId
+    })
+  })
+})
+
 module.exports = router;

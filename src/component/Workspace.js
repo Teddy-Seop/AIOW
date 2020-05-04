@@ -1,5 +1,6 @@
 import React from 'react';
 import Axios from 'axios';
+import Modal from 'react-modal';
 import {confirmAlert} from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import Tabs from '@material-ui/core/Tabs';
@@ -7,14 +8,27 @@ import Tab from '@material-ui/core/Tab';
 import Chat from './Chat';
 import '../static/css/workspace.css';
 
+Modal.setAppElement('#root')
+
 class Workspace extends React.Component{
 
     constructor(props){
         super(props);
+        this.handleCreate = this.handleCreate.bind(this);
         this.state = {
           info: [],
           channel: 0,
-          name: Math.random() * 100
+          create: '',
+          modalStyle:{
+            content : {
+                top                   : '50%',
+                left                  : '50%',
+                right                 : 'auto',
+                bottom                : 'auto',
+                marginRight           : '-50%',
+                transform             : 'translate(-50%, -50%)'
+              }
+          }
         }
     }
 
@@ -26,7 +40,6 @@ class Workspace extends React.Component{
             }
         })
         .then((res) => {
-            console.log(res);
             if(res.data[0][0].validate == 'success'){
                 document.querySelector('#name').innerHTML = res.data[0][0].name;
                 for(let item of res.data[1]){
@@ -72,6 +85,31 @@ class Workspace extends React.Component{
         });
     }
 
+    handleOpenModal = () => {
+        this.setState({showModal: true});
+    }
+
+    handleCloseModal = () => {
+        this.setState({showModal: false});
+    }
+
+    handleCreate(e){
+        this.setState({create:e.target.value})
+    }
+
+    create = () => {
+        Axios.post(`http://localhost:3001/api/workspace/channel`, {
+            channel: this.state.create,
+            wname: this.path
+        })
+        .then((res) => {
+            console.log(`Create Channel ${res.no}`);
+            this.setState({info: []})
+            this.side();
+            console.log(this.state.info);
+        })
+    }
+
     componentDidMount(){
         this.side();
     }
@@ -98,6 +136,7 @@ class Workspace extends React.Component{
                             )
                         })
                     }
+                    <button onClick={this.handleOpenModal}>ADD</button>
                 </Tabs>
                 </div>
                 <div id="center">
@@ -110,7 +149,7 @@ class Workspace extends React.Component{
                                     key={this.state.channel}
                                     workspace={this.path}
                                     channel={this.state.channel}
-                                    name={this.state.name}
+                                    name={window.sessionStorage.name}
                                 />   
                             </div>  
                         ):(
@@ -118,6 +157,19 @@ class Workspace extends React.Component{
                         )
                     }
                 </div>
+                <Modal
+                    isOpen={this.state.showModal}
+                    style={this.state.modalStyle}
+                    contentLabel="Example Modal"
+                >
+                <div>생성할 채널 이름을 입력해주세요</div>
+                <input type="text" onChange={this.handleCreate} /><br/>
+                <button onClick={event => {
+                    this.create();
+                    this.handleCloseModal();
+                }}>Create</button>
+                <button onClick={this.handleCloseModal}>close</button>
+                </Modal>
             </div>
         )
     }
