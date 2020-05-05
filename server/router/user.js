@@ -9,6 +9,17 @@ const connection = mysql.createConnection({
   database: 'aiow'
 })
 
+// 사용자 조회
+router.get('/', (req, res) => {
+  var sql = `SELECT * FROM user WHERE id="${req.query.id}"`;
+  connection.query(sql, (err, rows) => {
+    if(err) throw err;
+    console.log(rows);
+    res.json(rows);
+  })
+})
+
+// 로그인
 router.post('/login', (req, res) => {
 
   var id = req.body.id;
@@ -34,5 +45,22 @@ router.post('/login', (req, res) => {
     }
   })
 });
+
+// workspace 사용자 초대
+router.post('/workspace', (req, res) => {
+  console.log(req.body);
+  var sql1 = `SELECT no FROM user
+              WHERE id="${req.body.name}"`;
+  var sql2 = `SELECT no FROM workspace
+              WHERE name="${req.body.workspace}"`;
+  var sql3 = `INSERT INTO workspace_user (user_no, workspace_no)
+              VALUES ((${sql1}), (${sql2}))`;
+  connection.query(sql3, (err, rows) => {
+    if(err) throw err;
+
+    console.log(rows);
+    res.json(rows);
+  })
+})
  
 module.exports = router;

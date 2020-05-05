@@ -24,7 +24,7 @@ app.use(express.static(__dirname + '/static'));
 
 const userRouter = require('./router/user');
 const workspaceRouter = require('./router/workspace');
-app.use('/api', userRouter);
+app.use('/api/user', userRouter);
 app.use('/api/workspace', workspaceRouter);
 
 app.get('/', (req, res) => {

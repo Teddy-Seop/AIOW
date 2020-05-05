@@ -15,10 +15,12 @@ class Workspace extends React.Component{
     constructor(props){
         super(props);
         this.handleCreate = this.handleCreate.bind(this);
+        this.handleInvite = this.handleInvite.bind(this);
         this.state = {
           info: [],
           channel: 0,
           create: '',
+          invite: '',
           modalStyle:{
             content : {
                 top                   : '50%',
@@ -85,16 +87,16 @@ class Workspace extends React.Component{
         });
     }
 
-    handleOpenModal = () => {
-        this.setState({showModal: true});
+    handleOpenModal1 = () => {
+        this.setState({showModal1: true});
     }
 
-    handleCloseModal = () => {
-        this.setState({showModal: false});
+    handleCloseModal1 = () => {
+        this.setState({showModal1: false});
     }
 
     handleCreate(e){
-        this.setState({create:e.target.value})
+        this.setState({create:e.target.value});
     }
 
     create = () => {
@@ -107,6 +109,40 @@ class Workspace extends React.Component{
             this.setState({info: []})
             this.side();
             console.log(this.state.info);
+        })
+    }
+
+    handleOpenModal2 = () => {
+        this.setState({showModal2: true});
+    }
+
+    handleCloseModal2 = () => {
+        this.setState({showModal2: false});
+    }
+
+    handleInvite(e){
+        this.setState({invite: e.target.value});
+    }
+
+    invite = () => {
+        Axios.get(`http://localhost:3001/api/user`, {
+            params: {
+                id: this.state.invite
+            }
+        })
+        .then((res) => {
+            console.log(res.data);
+            if(res.data.length){
+                Axios.post(`http://localhost:3001/api/user/workspace`, {
+                    name: this.state.invite,
+                    workspace: this.path
+                })
+                .then((res) => {
+                    console.log(res);
+                })
+            }else{
+                alert('존재하지 않는 사용자입니다.')
+            }
         })
     }
 
@@ -136,7 +172,8 @@ class Workspace extends React.Component{
                             )
                         })
                     }
-                    <button onClick={this.handleOpenModal}>ADD</button>
+                    <button onClick={this.handleOpenModal1}>ADD CHANNEL</button>
+                    <button onClick={this.handleOpenModal2}>Invite</button>
                 </Tabs>
                 </div>
                 <div id="center">
@@ -158,7 +195,7 @@ class Workspace extends React.Component{
                     }
                 </div>
                 <Modal
-                    isOpen={this.state.showModal}
+                    isOpen={this.state.showModal1}
                     style={this.state.modalStyle}
                     contentLabel="Example Modal"
                 >
@@ -168,7 +205,20 @@ class Workspace extends React.Component{
                     this.create();
                     this.handleCloseModal();
                 }}>Create</button>
-                <button onClick={this.handleCloseModal}>close</button>
+                <button onClick={this.handleCloseModal1}>close</button>
+                </Modal>
+                <Modal
+                    isOpen={this.state.showModal2}
+                    style={this.state.modalStyle}
+                    contentLabel="Example Modal"
+                >
+                <div>초대할 ID를 입력해주세요</div>
+                <input type="text" onChange={this.handleInvite} /><br/>
+                <button onClick={event => {
+                    this.invite();
+                    this.handleCloseModal2();
+                }}>Create</button>
+                <button onClick={this.handleCloseModal2}>close</button>
                 </Modal>
             </div>
         )
