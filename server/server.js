@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
 const socket = require('socket.io');
+const upload = require('multer');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
@@ -15,7 +16,7 @@ const connection = mysql.createConnection({
     database: 'aiow'
 })
 
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 app.use('/css', express.static('./static/css'));
 app.use('/js', express.static('./static/js'));
 app.use(cors());
@@ -24,8 +25,10 @@ app.use(express.static(__dirname + '/static'));
 
 const userRouter = require('./router/user');
 const workspaceRouter = require('./router/workspace');
+const uploadRouter = require('./router/upload');
 app.use('/api/user', userRouter);
 app.use('/api/workspace', workspaceRouter);
+app.use('/api/upload', uploadRouter);
 
 app.get('/', (req, res) => {
 
@@ -33,7 +36,7 @@ app.get('/', (req, res) => {
 })
 
 io.sockets.on('connect', (socket) => {
-    var room = 1;
+    var room;
 
     socket.on('message', (data) => {
         console.log(data);
@@ -43,7 +46,18 @@ io.sockets.on('connect', (socket) => {
           if(err) throw err;
           console.log(rows);
         })
-        io.sockets.in(room).emit('update', data);
+        io.sockets.in(room).emit('message', data);
+    })
+
+    socket.on('upload', (data) => {
+        console.log(data);
+        var sql = `INSERT INTO message (message, user_no, channel_no)
+                    VALUES ("${data.message}", ${data.uno}, ${data.channel});`;
+        connection.query(sql, (err, rows) => {
+          if(err) throw err;
+          console.log(rows);
+        })
+        io.sockets.in(room).emit('upload', data);
     })
 
     socket.on('joinRoom', (num, name) => {
