@@ -40,8 +40,8 @@ io.sockets.on('connect', (socket) => {
 
     socket.on('message', (data) => {
         console.log(data);
-        var sql = `INSERT INTO message (message, user_no, channel_no)
-                    VALUES ("${data.message}", ${data.uno}, ${data.channel});`;
+        var sql = `INSERT INTO message (message, type, user_no, channel_no)
+                    VALUES ("${data.message}", 0, ${data.uno}, ${data.channel});`;
         connection.query(sql, (err, rows) => {
           if(err) throw err;
           console.log(rows);
@@ -51,12 +51,12 @@ io.sockets.on('connect', (socket) => {
 
     socket.on('upload', (data) => {
         console.log(data);
-        var sql = `INSERT INTO message (message, user_no, channel_no)
-                    VALUES ("${data.message}", ${data.uno}, ${data.channel});`;
-        connection.query(sql, (err, rows) => {
-          if(err) throw err;
-          console.log(rows);
-        })
+        // var sql = `INSERT INTO message (message, type, user_no, channel_no)
+        //             VALUES ("${data.message}", 1, ${data.uno}, ${data.channel});`;
+        // connection.query(sql, (err, rows) => {
+        //   if(err) throw err;
+        //   console.log(rows);
+        // })
         io.sockets.in(room).emit('upload', data);
     })
 

@@ -78,6 +78,10 @@ class Chat extends React.Component{
         Axios.post('http://localhost:3001/api/upload', form, {
             headers: {
                 'Content-Type': 'multipart/form-data'
+            },
+            params: {
+                uno: window.sessionStorage.uno,
+                channel: this.state.channel
             }
         })
         .then((res) => {
