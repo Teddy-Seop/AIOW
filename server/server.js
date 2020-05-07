@@ -25,10 +25,10 @@ app.use(express.static(__dirname + '/static'));
 
 const userRouter = require('./router/user');
 const workspaceRouter = require('./router/workspace');
-const uploadRouter = require('./router/upload');
+const fileRouter = require('./router/file');
 app.use('/api/user', userRouter);
 app.use('/api/workspace', workspaceRouter);
-app.use('/api/upload', uploadRouter);
+app.use('/api/file', fileRouter);
 
 app.get('/', (req, res) => {
 
@@ -51,12 +51,6 @@ io.sockets.on('connect', (socket) => {
 
     socket.on('upload', (data) => {
         console.log(data);
-        // var sql = `INSERT INTO message (message, type, user_no, channel_no)
-        //             VALUES ("${data.message}", 1, ${data.uno}, ${data.channel});`;
-        // connection.query(sql, (err, rows) => {
-        //   if(err) throw err;
-        //   console.log(rows);
-        // })
         io.sockets.in(room).emit('upload', data);
     })
 

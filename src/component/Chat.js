@@ -29,7 +29,11 @@ class Chat extends React.Component{
             })
             var content = document.querySelector('#content');
             this.state.info.map((item) => {
-                content.value += `${item.message}\n`;
+                if(item.type === 0){
+                    content.innerHTML += `${item.message}<br>`;
+                }else{
+                    content.innerHTML += `<a href="http://localhost:3001/api/file/${item.no}">${item.message}</a><br>`
+                }
             })
         })
         // Connect 이벤트
@@ -44,14 +48,14 @@ class Chat extends React.Component{
 
         socket.on('message', (data) => {
             console.log('message');
-            var str = `${data.message}\n`;
-            document.querySelector('#content').value += str;
+            var str = `${data.message}<br>`;
+            document.querySelector('#content').innerHTML += str;
         })
 
         socket.on('upload', (data) => {
             console.log('upload');
-            var str = `${data.message}\n`;
-            document.querySelector('#content').value += str;
+            var str = `<a href="#">${data.message}</a><br>`;
+            document.querySelector('#content').innerHTML += str;
         })
     }
 
@@ -75,7 +79,7 @@ class Chat extends React.Component{
         var form = new FormData();
         var file = document.querySelector('#file');
         form.append('file', file.files[0]);
-        Axios.post('http://localhost:3001/api/upload', form, {
+        Axios.post('http://localhost:3001/api/file', form, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             },
@@ -99,7 +103,8 @@ class Chat extends React.Component{
         return (
             <div>
                 <div id="main">
-                    <textarea id="content" cols="30" rows="10" readOnly></textarea>
+                    <div id="content"></div>
+                    {/* <textarea id="content" cols="30" rows="10" readOnly></textarea> */}
                     <input type="text" id="message" />
                     <button type="button" onClick={this.send}>SEND</button>
                     <form action="upload" method="POST" encType="multipart/form-data">
